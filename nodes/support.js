@@ -83,10 +83,16 @@ async function login(node, idAuth) {
     headers: {
       ...staticHeaders,
       'Content-Type': 'application/json',
-      'Content-Length': dataString.length,
+      'Content-Length': Buffer.byteLength(dataString, 'utf8')
     },
   };
+  try {
   return await axiosLibrary(options);
+  } catch (err) {
+	    node.log(JSON.stringify(err.response?.data, null, 2));
+	    err.message = `${err.message} - ${JSON.stringify(err.response?.data || {})}`;
+	    throw err;
+    }
 }
 
 async function sendRequest({ node, msg, config, axios, login, options }, manageError=true) {
